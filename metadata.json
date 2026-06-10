@@ -1,0 +1,8 @@
+{
+  "name": "Daily Report Workbook Manager",
+  "description": "Generate dynamic, styled Excel workbooks for retail daily reports with automated cash flow formulas and multi-sheet summaries.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
