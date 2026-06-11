@@ -59,6 +59,24 @@ export async function loadWorkbookFromFile(file: File): Promise<DailyReportData[
         const grossSales = getNum(sheet.getCell('E4').value);
         const cashDrop = getNum(sheet.getCell('E7').value);
         
+        // Extract correction notes and checked status if any
+        const noteCellValue = sheet.getCell('B10').value;
+        let correctionNote = '';
+        let isCorrected = false;
+        if (noteCellValue) {
+          const rawText = getCellValueText(noteCellValue);
+          const prefix = "Audit Correction & Safe Logs:\n";
+          if (rawText.startsWith(prefix)) {
+            let content = rawText.slice(prefix.length);
+            const isCorrectedSuffix = ' (MARKED AS RECONCILED/INVESTIGATED)';
+            if (content.endsWith(isCorrectedSuffix)) {
+              isCorrected = true;
+              content = content.slice(0, -isCorrectedSuffix.length);
+            }
+            correctionNote = content;
+          }
+        }
+        
         // Formulate date from sheet name
         let dateStr = '';
         const sheetName = sheet.name;
@@ -81,6 +99,8 @@ export async function loadWorkbookFromFile(file: File): Promise<DailyReportData[
           lotteryPayout,
           grossSales,
           cashDrop,
+          correctionNote: correctionNote || undefined,
+          isCorrected: isCorrected || undefined
         });
       }
     } catch (e) {
@@ -218,7 +238,23 @@ export function addDailyReportSheet(workbook: ExcelJS.Workbook, report: DailyRep
   styleLabel('B8', 'Total Credit');
   styleValue('C8', 'SUM(C4:C6)', true); // Formula sum of debit/credit/ebt + cash payout + lottery payout
   styleLabel('D8', 'Over/Short');
-  styleValue('E8', 'E6-E7', true); // Formula: Estimated Drop - Cash Drop
+  styleValue('E8', 'E7-E6', true); // Formula: Actual Cash Drop - Estimated Drop
+
+  if (report.correctionNote) {
+    sheet.mergeCells('B10:E11');
+    const noteCell = sheet.getCell('B10');
+    noteCell.value = `Audit Correction & Safe Logs:\n${report.correctionNote}${report.isCorrected ? ' (MARKED AS RECONCILED/INVESTIGATED)' : ''}`;
+    noteCell.font = { name: 'Arial', size: 9, italic: true, color: { argb: '595959' } };
+    noteCell.alignment = { wrapText: true, vertical: 'top', horizontal: 'left' };
+    noteCell.border = {
+      top: { style: 'thin', color: { argb: 'A6A6A6' } },
+      left: { style: 'thin', color: { argb: 'A6A6A6' } },
+      bottom: { style: 'thin', color: { argb: 'A6A6A6' } },
+      right: { style: 'thin', color: { argb: 'A6A6A6' } }
+    };
+    sheet.getRow(10).height = 18;
+    sheet.getRow(11).height = 18;
+  }
 }
 
 export function addSummarySheet(workbook: ExcelJS.Workbook, reports: DailyReportData[]) {

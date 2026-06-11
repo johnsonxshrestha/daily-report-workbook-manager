@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { DailyReportData } from '../types';
-import { Sparkles, TrendingDown, TrendingUp, DollarSign, Calculator } from 'lucide-react';
+import { Sparkles, TrendingDown, TrendingUp, DollarSign, Calculator, Coins } from 'lucide-react';
 
 interface SummaryDashboardPreviewProps {
   reports: DailyReportData[];
@@ -365,18 +365,18 @@ export default function SummaryDashboardPreview({
               <DollarSign className="w-5 h-5" />
             </div>
             <div>
-              <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Gross Book Sales</div>
+              <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Monthly Total Gross</div>
               <div className="text-sm font-bold text-slate-200">{formatCurrency(totals.grossSales)}</div>
             </div>
           </div>
 
           <div className="bg-slate-900 rounded-lg border border-slate-800 p-3 shadow-xs flex items-center gap-3">
             <div className="h-10 w-10 rounded-lg bg-indigo-950/50 text-indigo-400 border border-indigo-900/30 flex items-center justify-center">
-              <Calculator className="w-5 h-5" />
+              <Coins className="w-5 h-5" />
             </div>
             <div>
-              <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Total Credit Claims</div>
-              <div className="text-sm font-bold text-slate-200">{formatCurrency(totals.totalCredit)}</div>
+              <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Monthly Total Cash Drop</div>
+              <div className="text-sm font-bold text-slate-200">{formatCurrency(totals.cashDrop)}</div>
             </div>
           </div>
 
@@ -385,11 +385,11 @@ export default function SummaryDashboardPreview({
               {totals.overShort < 0 ? <TrendingDown className="w-5 h-5" /> : <TrendingUp className="w-5 h-5" />}
             </div>
             <div>
-              <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Consolidated Variance</div>
-              <div className={`text-sm font-bold ${totals.overShort < 0 ? 'text-red-400' : 'text-emerald-400'}`}>
-                {formatCurrency(totals.overShort)}
-                <span className="text-[10px] font-medium ml-1 text-slate-400">
-                  ({totals.overShort < 0 ? 'Short' : totals.overShort > 0 ? 'Over' : 'Balanced'})
+              <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Total Over/Short (No-Reset)</div>
+              <div className={`text-sm font-bold ${totals.overShort < 0 ? 'text-red-400' : 'text-emerald-400'} flex items-center gap-1.5 flex-wrap`}>
+                <span>{formatCurrency(totals.overShort)}</span>
+                <span className="text-[10px] font-bold bg-slate-950/70 border border-slate-800 text-slate-300 px-1.5 py-0.5 rounded">
+                  {(totals.overShort >= 0 ? '+' : '') + (totals.grossSales !== 0 ? (totals.overShort / totals.grossSales) * 100 : 0).toFixed(2)}%
                 </span>
               </div>
             </div>

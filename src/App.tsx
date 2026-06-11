@@ -3,6 +3,7 @@ import { DailyReportData } from './types';
 import ReportForm from './components/ReportForm';
 import ExcelPreview from './components/ExcelPreview';
 import SummaryDashboardPreview from './components/SummaryDashboardPreview';
+import CorrectionsTab from './components/CorrectionsTab';
 import { 
   downloadWorkbook, 
   loadWorkbookFromFile 
@@ -23,7 +24,8 @@ import {
   FilePlus,
   ArrowRight,
   TrendingUp,
-  Plus
+  Plus,
+  Wrench
 } from 'lucide-react';
 
 const SAMPLE_REPORTS: DailyReportData[] = [
@@ -201,6 +203,12 @@ export default function App() {
         setActiveTab('Unsaved Draft');
       }
     }
+  };
+
+  // Update specific report values and save
+  const handleUpdateReport = (updatedReport: DailyReportData) => {
+    const updated = reports.map(r => r.id === updatedReport.id ? updatedReport : r);
+    saveReportsToStorage(updated);
   };
 
   // Bulk delete selected reports
@@ -595,6 +603,22 @@ export default function App() {
                 <span>Summary Dashboard</span>
               </button>
 
+              {/* Corrections Tab */}
+              <button
+                onClick={() => {
+                  setActiveTab('Corrections Tab');
+                  setEditingReportId(null);
+                }}
+                className={`px-3 py-1.5 text-xs font-bold rounded transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer ${
+                  activeTab === 'Corrections Tab'
+                    ? 'bg-slate-950 text-orange-400 border border-slate-800 shadow-xs'
+                    : 'bg-[#151c2e] hover:bg-[#1d273f] text-slate-400 border border-transparent'
+                }`}
+              >
+                <Wrench className="w-3.5 h-3.5" />
+                <span>Corrections Tab</span>
+              </button>
+
               {/* Space divider */}
               <div className="h-4 w-[1px] bg-slate-800 mx-1 flex-shrink-0"></div>
 
@@ -640,6 +664,12 @@ export default function App() {
             {activeTab === 'Summary Dashboard' && reports.length > 0 ? (
               <SummaryDashboardPreview 
                 reports={reports} 
+                onSelectTab={(name) => setActiveTab(name)}
+              />
+            ) : activeTab === 'Corrections Tab' && reports.length > 0 ? (
+              <CorrectionsTab 
+                reports={reports}
+                onUpdateReport={handleUpdateReport}
                 onSelectTab={(name) => setActiveTab(name)}
               />
             ) : (

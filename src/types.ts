@@ -8,6 +8,9 @@ export interface DailyReportData {
   grossSales: number;
   cashDrop: number;
   updatedAt?: number;
+  correctionNote?: string;
+  correctionAmount?: number;
+  isCorrected?: boolean;
 }
 
 export interface SummaryStats {
